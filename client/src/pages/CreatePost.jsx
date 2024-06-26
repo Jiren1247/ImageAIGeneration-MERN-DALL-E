@@ -17,12 +17,55 @@ function CreatePost() {
   const [generatingImg, setGeneratingImg] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const generateImage = () => {
-
+  const generateImage = async() => {
+    if (form.prompt) {
+      try {
+        setGeneratingImg(true);
+        const response = await fetch('http://localhost:8080/api/v1/dalle', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ prompt: form.prompt })
+          // 这个是输入到后端的body，定义了我输入后端的内容只有form.prompt
+        })
+        const data = await response.json();
+        setForm({...form, photo: `data:image/jpeg;base64,${data.photo}`});
+      } catch (error) {
+        alert(error);
+      } finally {
+        setGeneratingImg(false);
+      }
+    } else {
+      alert('Please enter a prompt');
+    } 
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
+    if (form.prompt && form.photo) {
+      setLoading(true);
+
+      try {
+        const response = await fetch('http://localhost:8080/api/v1/post', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(form)
+        })
+        console.log(response);
+        await response.json();
+        navigate('/');
+      } catch (error) {
+        alert(error);
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      alert('Please enter a prompt and generate an image')
+    }
   }
 
   const handleChange = (e) => {
