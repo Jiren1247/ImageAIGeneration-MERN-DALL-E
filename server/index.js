@@ -20,10 +20,12 @@ app.get('/', async(req, res) => {
     res.send('Hello from DALL-E!');
 });
 
+const port = process.env.PORT || 4000;
+
 const startServer = async () => {
     try {
         connectDB(process.env.MONGODB_URL);
-        app.listen(8080, () => console.log('Server has started on port http://localhost:8080'));
+        app.listen(8080,'0.0.0.0', () => console.log('Server has started on port http://localhost:8080'));
     } catch (error) {
         console.log('Error connecting to MongoDB:', error);
     }
